@@ -3,21 +3,31 @@ package org.insa.graph;
 public class Label implements Comparable<Label> {
 	
 	private int idNode;
-	private float cost;
+	private double cost;
 	private Node father;
 	private boolean mark;
+	private Arc arcLeast;
 	
 	public Label (int id) {
 		this.idNode = id;
 		this.mark = false;
 		this.father = null;
+		this.arcLeast = null;
 	}
 	
+	public Arc getArcLeast() {
+		return arcLeast;
+	}
+
+	public void setArcLeast(Arc arcLeast) {
+		this.arcLeast = arcLeast;
+	}
+
 	public void setIdNode(int idNode) {
 		this.idNode = idNode;
 	}
 
-	public void setCost(float cost) {
+	public void setCost(double cost) {
 		this.cost = cost;
 	}
 
@@ -33,7 +43,7 @@ public class Label implements Comparable<Label> {
 		return idNode;
 	}
 
-	public float getCost() {
+	public double getCost() {
 		return cost;
 	}
 

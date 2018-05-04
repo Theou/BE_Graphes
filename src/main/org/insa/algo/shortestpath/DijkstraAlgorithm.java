@@ -1,8 +1,9 @@
 package org.insa.algo.shortestpath;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+// import java.util.Arrays;
+// import java.util.List;
+import java.util.Collections;
 
 import org.insa.algo.AbstractSolution.Status;
 import org.insa.algo.utils.BinaryHeap;
@@ -20,11 +21,13 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 
 	@Override
     protected ShortestPathSolution doRun() {
+		
         ShortestPathData data = getInputData();
         Graph graph = data.getGraph();
         ShortestPathSolution solution = null;
         Path chemin;
-        ArrayList<Node> nodes = new ArrayList<Node>();
+        //ArrayList<Node> nodes = new ArrayList<Node>();
+        ArrayList<Arc> arcs = new ArrayList<Arc>();
 
         final int nbNodes = graph.size();
         
@@ -35,19 +38,21 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 		int i;
 		for (Node n : graph) {
 			i = n.getId();
-			if (n.equals( data.getOrigin())) {
+			if (n.equals(data.getOrigin())) {
 				labels[i] = new Label(data.getOrigin().getId());
 				labels[i].setCost(0);
 				labels[i].setFather(null);
 				labels[i].setMark(true);
+				tas.insert(labels[i]);
 			}
 			else {
 				labels[i] = new Label(n.getId());
 				labels[i].setCost(Float.POSITIVE_INFINITY);
 			}
+			
 		}
 		
-		tas.insert(labels[data.getOrigin().getId()]);
+		// tas.insert(labels[data.getOrigin().getId()]);
 		
 		while (!tas.isEmpty() && !labels[data.getDestination().getId()].isMark()) {
 			Label l = tas.deleteMin();
@@ -56,24 +61,59 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 			for (Arc a : n) {
 				Node successor = a.getDestination();
 				if (labels[successor.getId()].isMark() == false) {
-					labels[successor.getId()].setCost(Math.min(labels[successor.getId()].getCost(), labels[n.getId()].getCost() + a.getLength()));
-					if (labels[successor.getId()].getCost() == labels[n.getId()].getCost() + a.getLength()) {
+					// double cout = Math.min(labels[successor.getId()].getCost(), labels[n.getId()].getCost() + data.getCost(a));
+					if (labels[successor.getId()].getCost() > labels[n.getId()].getCost() + data.getCost(a)) {
+						if (labels[successor.getId()].getCost() != Float.POSITIVE_INFINITY)
+							tas.remove(labels[successor.getId()]);
+						labels[successor.getId()].setCost(labels[n.getId()].getCost() + data.getCost(a));
 						tas.insert(labels[successor.getId()]);
 						labels[successor.getId()].setFather(n);
+						labels[successor.getId()].setArcLeast(a);
 					}	
 				}
 			}
 		}
-		nodes.add(data.getDestination());
+		
+		if (labels[data.getDestination().getId()].isMark()) {
+			Node sommet = data.getDestination();
+			while (!sommet.equals(data.getOrigin())) {
+				
+				arcs.add(labels[sommet.getId()].getArcLeast());
+				Node parent = labels[sommet.getId()].getFather();
+				sommet = parent;
+				
+			}
+			Collections.reverse(arcs);
+			chemin = new Path(graph, arcs);
+			solution = new ShortestPathSolution(data, Status.OPTIMAL, chemin);
+		}
+		else {
+			solution = new ShortestPathSolution(data, Status.INFEASIBLE);
+		}
+		
+		/*nodes.add(data.getDestination());
 		Node sommet = data.getDestination();
-		while (!sommet.equals(data.getOrigin())) {
+		while (sommet != null && !sommet.equals(data.getOrigin())) {
 			nodes.add(labels[sommet.getId()].getFather());
 			sommet = labels[sommet.getId()].getFather();
 		}
+		
 		// Ajouter liste d'arcs pour utiliser la fonction new Path(graph, arcs)
-		nodes.
-		chemin = Path.createShortestPathFromNodes(graph, nodes);
-		solution = new ShortestPathSolution(data, Status.OPTIMAL, chemin);
+		for (i = nodes.size() - 1; i > 0; --i) {
+			float cost = Float.POSITIVE_INFINITY;
+			Arc arcToInsert = null;
+			for (Arc a : nodes.get(i)) {
+				if (a.getDestination().equals(nodes.get(i-1))) {
+					if (a.getLength() < cost) {
+						cost = a.getLength();
+						arcToInsert = a;
+					}
+				}
+			}
+			if (arcToInsert != null)
+				arcs.add(arcToInsert);
+		}*/
+		
         return solution;
     }
 
