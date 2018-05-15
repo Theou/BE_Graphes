@@ -26,7 +26,6 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         Graph graph = data.getGraph();
         ShortestPathSolution solution = null;
         Path chemin;
-        //ArrayList<Node> nodes = new ArrayList<Node>();
         ArrayList<Arc> arcs = new ArrayList<Arc>();
 
         final int nbNodes = graph.size();
@@ -52,14 +51,19 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 			
 		}
 		
-		// tas.insert(labels[data.getOrigin().getId()]);
+		notifyOriginProcessed(data.getOrigin());
 		
 		while (!tas.isEmpty() && !labels[data.getDestination().getId()].isMark()) {
 			Label l = tas.deleteMin();
 			labels[l.getIdNode()].setMark(true);
 			Node n = graph.get(l.getIdNode());
+			notifyNodeMarked(n);
 			for (Arc a : n) {
+				if (!data.isAllowed(a)) {
+					continue;
+				}
 				Node successor = a.getDestination();
+				notifyNodeReached(successor);
 				if (labels[successor.getId()].isMark() == false) {
 					// double cout = Math.min(labels[successor.getId()].getCost(), labels[n.getId()].getCost() + data.getCost(a));
 					if (labels[successor.getId()].getCost() > labels[n.getId()].getCost() + data.getCost(a)) {
@@ -75,6 +79,7 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 		}
 		
 		if (labels[data.getDestination().getId()].isMark()) {
+			notifyDestinationReached(data.getDestination());
 			Node sommet = data.getDestination();
 			while (!sommet.equals(data.getOrigin())) {
 				
@@ -90,29 +95,6 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
 		else {
 			solution = new ShortestPathSolution(data, Status.INFEASIBLE);
 		}
-		
-		/*nodes.add(data.getDestination());
-		Node sommet = data.getDestination();
-		while (sommet != null && !sommet.equals(data.getOrigin())) {
-			nodes.add(labels[sommet.getId()].getFather());
-			sommet = labels[sommet.getId()].getFather();
-		}
-		
-		// Ajouter liste d'arcs pour utiliser la fonction new Path(graph, arcs)
-		for (i = nodes.size() - 1; i > 0; --i) {
-			float cost = Float.POSITIVE_INFINITY;
-			Arc arcToInsert = null;
-			for (Arc a : nodes.get(i)) {
-				if (a.getDestination().equals(nodes.get(i-1))) {
-					if (a.getLength() < cost) {
-						cost = a.getLength();
-						arcToInsert = a;
-					}
-				}
-			}
-			if (arcToInsert != null)
-				arcs.add(arcToInsert);
-		}*/
 		
         return solution;
     }
