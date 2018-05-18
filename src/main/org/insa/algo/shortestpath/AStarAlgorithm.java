@@ -39,14 +39,14 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
 		for (Node n : graph) {
 			i = n.getId();
 			if (n.equals(data.getOrigin())) {
-				labels[i] = new LabelStar(data.getOrigin().getId());
+				labels[i] = new LabelStar(data.getOrigin().getId(), data);
 				labels[i].setCost(0);
 				labels[i].setFather(null);
 				labels[i].setMark(true);
 				tas.insert(labels[i]);
 			}
 			else {
-				labels[i] = new LabelStar(n.getId());
+				labels[i] = new LabelStar(n.getId(), data);
 				labels[i].setCostVol(Point.distance(n.getPoint(),data.getDestination().getPoint()));
 				labels[i].setCost(Float.POSITIVE_INFINITY);
 				
@@ -70,9 +70,9 @@ public class AStarAlgorithm extends DijkstraAlgorithm {
 				if (labels[successor.getId()].isMark() == false) {
 					// double cout = Math.min(labels[successor.getId()].getCost(), labels[n.getId()].getCost() + data.getCost(a));
 					if (labels[successor.getId()].getCost() > labels[n.getId()].getCost() + data.getCost(a)) {
-						if (labels[successor.getId()].getCost()  - labels[n.getId()].getCostVol() != Float.POSITIVE_INFINITY)
+						if (labels[successor.getId()].getCost() != Float.POSITIVE_INFINITY)
 							tas.remove(labels[successor.getId()]);
-						labels[successor.getId()].setCost(labels[n.getId()].getCost() - labels[n.getId()].getCostVol() + data.getCost(a));
+						labels[successor.getId()].setCost(labels[n.getId()].getCost() + data.getCost(a));
 						tas.insert(labels[successor.getId()]);
 						labels[successor.getId()].setFather(n);
 						labels[successor.getId()].setArcLeast(a);

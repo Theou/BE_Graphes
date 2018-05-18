@@ -1,5 +1,6 @@
 package org.insa.graph;
 
+
 public class Label implements Comparable<Label> {
 	
 	private int idNode;
@@ -46,6 +47,10 @@ public class Label implements Comparable<Label> {
 	public double getCost() {
 		return cost;
 	}
+	
+	public double getTotalCost() {
+		return cost;
+	}
 
 	public Node getFather() {
 		return father;
@@ -61,9 +66,9 @@ public class Label implements Comparable<Label> {
 
 	@Override
 	public int compareTo(Label autre) {
-		if (this.getCost() < autre.getCost())
+		if (this.getTotalCost() < autre.getTotalCost())
 			return -1;
-		else if (this.getCost() == autre.getCost())
+		else if (this.getTotalCost() == autre.getTotalCost())
 			return 0;
 		else 
 			return 1;
