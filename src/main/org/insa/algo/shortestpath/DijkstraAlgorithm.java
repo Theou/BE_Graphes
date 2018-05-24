@@ -27,6 +27,11 @@ public class DijkstraAlgorithm extends ShortestPathAlgorithm {
         ShortestPathSolution solution = null;
         Path chemin;
         ArrayList<Arc> arcs = new ArrayList<Arc>();
+        
+        if (data.getOrigin().equals(data.getDestination())) {
+        	solution = new ShortestPathSolution(data, Status.INFEASIBLE);
+        	return solution;
+        }
 
         final int nbNodes = graph.size();
         
